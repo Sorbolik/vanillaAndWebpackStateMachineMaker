@@ -1,0 +1,14 @@
+@import "./reset.css";
+
+.page-wrapper {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.page-wrapper>* {
+    flex: 1 100%;
+}
+
+.page {
+    margin: auto;
+}
