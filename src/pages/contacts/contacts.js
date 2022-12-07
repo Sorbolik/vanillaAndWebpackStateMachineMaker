@@ -1,22 +1,14 @@
-import { composeTemplate, fetchFromFile } from "../../utils/misc.js";
-
-const ContactsPageMetaUrl = import.meta.url
-
-class ContactsPage extends HTMLElement {
+import html from "./contacts.html";
+import css from "./contacts.css";
+import { setupShadow } from "../../utils/misc";
+export class ContactsPage extends HTMLElement {
 
     constructor() {
         super();
+        setupShadow(this, html, css);
     }
 
-    async connectedCallback() {
+    connectedCallback() {
 
-        let html = await fetchFromFile(ContactsPageMetaUrl, './contacts.html');
-        let css = await fetchFromFile(ContactsPageMetaUrl, './contacts.css');
-        this.attachShadow({ mode: 'open' })
-        this.shadowRoot.appendChild(composeTemplate(html, css).content.cloneNode(true));
     }
 }
-
-window.customElements.define('contacts-page', ContactsPage);
-
-export { ContactsPageMetaUrl }

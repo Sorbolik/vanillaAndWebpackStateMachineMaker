@@ -1,22 +1,18 @@
-import { composeTemplate, fetchFromFile } from "../../utils/misc.js";
+import html from "./playground.html";
+import css from "./playground.css";
+import { setupShadow } from "../../utils/misc";
 
-const PlaygroundMetaUrl = import.meta.url
-
-class Playground extends HTMLElement {
+export class Playground extends HTMLElement {
 
     playgroundContainer = null;
     box = null;
 
     constructor() {
         super();
+        setupShadow(this, html, css);
     }
 
     async connectedCallback() {
-
-        let html = await fetchFromFile(PlaygroundMetaUrl, './playground.html');
-        let css = await fetchFromFile(PlaygroundMetaUrl, './playground.css');
-        this.attachShadow({ mode: 'open' })
-        this.shadowRoot.appendChild(composeTemplate(html, css).content.cloneNode(true));
         this.playgroundContainer = this.shadowRoot.querySelector('#playground-container');
         this.box = this.shadowRoot.querySelector('.box');
         this.createGrid();
@@ -53,10 +49,5 @@ class Playground extends HTMLElement {
             item.addEventListener('dragstart', handleDragStart, false);
             item.addEventListener('dragend', handleDragEnd, false);
         });
-
     }
 }
-
-window.customElements.define('play-ground', Playground);
-
-export { PlaygroundMetaUrl }

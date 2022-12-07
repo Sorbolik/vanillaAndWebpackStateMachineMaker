@@ -1,7 +1,7 @@
-import html from "./home.html";
-import css from "./home.css";
+import html from "./controlBar.html";
+import css from "./controlBar.css";
 import { setupShadow } from "../../utils/misc";
-export class HomePage extends HTMLElement {
+export class ControlBar extends HTMLElement {
 
     constructor() {
         super();
@@ -9,6 +9,10 @@ export class HomePage extends HTMLElement {
     }
 
     connectedCallback() {
+
+    }
+
+    funcs() {
 
     }
 }

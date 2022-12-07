@@ -1,20 +1,14 @@
-import { composeTemplate, fetchFromFile } from "../../utils/misc.js";
-
-const HeaderMetaUrl = import.meta.url
-
-class Header extends HTMLElement {
+import html from "./header.html";
+import css from "./header.css";
+import { setupShadow } from "../../utils/misc";
+export class Header extends HTMLElement {
 
     constructor() {
         super();
+        setupShadow(this, html, css);
     }
 
-    async connectedCallback() {
-
-        let html = await fetchFromFile(HeaderMetaUrl, './header.html');
-        let css = await fetchFromFile(HeaderMetaUrl, './header.css');
-        this.attachShadow({ mode: 'open' })
-        this.shadowRoot.appendChild(composeTemplate(html, css).content.cloneNode(true));
-
+    connectedCallback() {
         this.shadowRoot.querySelectorAll('a').forEach(child => {
             child.addEventListener('click', () => {
                 this.onNavigate(child.getAttribute('redirectTo'));
@@ -30,7 +24,3 @@ class Header extends HTMLElement {
         )
     }
 }
-
-window.customElements.define('app-header', Header);
-
-export { HeaderMetaUrl }

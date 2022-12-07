@@ -1,8 +1,7 @@
-import { composeTemplate, fetchFromFile } from "../../utils/misc.js";
-
-const AppRouterMetaUrl = import.meta.url;
-
-class AppRouter extends HTMLElement {
+import html from "./router.html";
+import css from "./router.css";
+import { setupShadow } from "../../utils/misc";
+export class AppRouter extends HTMLElement {
 
     oldRef = ``;
     routes = {
@@ -15,14 +14,12 @@ class AppRouter extends HTMLElement {
         this.initRouter();
         window.addEventListener('locationchange', () => {
             this.onRouteChanged();
-        })
+        });
+        setupShadow(this, html, css);
+
     }
 
-    async connectedCallback() {
-        let html = await fetchFromFile(AppRouterMetaUrl, './router.html');
-        let css = await fetchFromFile(AppRouterMetaUrl, './router.css');
-        this.attachShadow({ mode: 'open' })
-        this.shadowRoot.appendChild(composeTemplate(html, css).content.cloneNode(true));
+    connectedCallback() {
         this.onRouteChanged();
     }
 
@@ -60,7 +57,3 @@ class AppRouter extends HTMLElement {
         )
     }
 }
-
-window.customElements.define('app-router', AppRouter);
-
-export { AppRouterMetaUrl }

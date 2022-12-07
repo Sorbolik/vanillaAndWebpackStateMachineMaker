@@ -1,27 +1,20 @@
-//add every module (web components) script to the index.html file
-import { AppMetaUrl } from "./app/app.js";
-import { AppRouterMetaUrl } from "./app/router/router.js";
-import { HeaderMetaUrl } from "./components/header/header.js";
-import { PlaygroundMetaUrl } from "./components/playground/playground.js";
-import { ContactsPageMetaUrl } from "./pages/contacts/contacts.js";
-import { HomePageMetaUrl } from "./pages/home/home.js";
-
-const webComponents = [
-    AppMetaUrl,
-    HeaderMetaUrl,
-    AppRouterMetaUrl,
-    ContactsPageMetaUrl,
-    HomePageMetaUrl,
-    PlaygroundMetaUrl
-]
-
-webComponents.forEach(componentUrl => {
-
-    let script = document.createElement('script');
-    script.src = `${componentUrl}`;
-    script.type = 'module';
-    document.querySelector('meta').appendChild(script);
-})
+import { App } from "./app/app";
+import { AppRouter } from "./app/router/router";
+import { ControlBar } from "./components/controlBar/controlBar";
+import { Header } from "./components/header/header";
+import { Playground } from "./components/playground/playground";
+import { ContactsPage } from "./pages/contacts/contacts";
+import { HomePage } from "./pages/home/home";
 
 
 
+// Define all custom elements (pages)
+customElements.define('web-app', App);
+customElements.define('app-router', AppRouter);
+customElements.define("home-page", HomePage);
+customElements.define('contacts-page', ContactsPage);
+
+//components
+customElements.define('app-header', Header);
+customElements.define('play-ground', Playground);
+customElements.define('control-bar', ControlBar);

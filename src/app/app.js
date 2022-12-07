@@ -1,21 +1,15 @@
-import { composeTemplate, fetchFromFile } from "../utils/misc.js";
+import html from "./app.html";
+import css from "./app.css";
+import { setupShadow } from "../utils/misc";
 
-const AppMetaUrl = import.meta.url;
-
-class App extends HTMLElement {
+export class App extends HTMLElement {
 
     constructor() {
         super();
+        setupShadow(this, html, css);
     }
 
-    async connectedCallback() {
-        let html = await fetchFromFile(AppMetaUrl, './app.html');
-        let css = await fetchFromFile(AppMetaUrl, './app.css');
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.appendChild(composeTemplate(html, css).content.cloneNode(true));
-    }
+    connectedCallback() {
 
+    }
 }
-
-window.customElements.define('web-app', App)
-export { AppMetaUrl };

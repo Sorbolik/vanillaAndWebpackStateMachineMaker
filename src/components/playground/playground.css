@@ -1,7 +1,15 @@
 .container {
+    display: flex;
+    flex-direction: column;
+}
+
+.control-bar {}
+
+.playground {
     display: grid;
     gap: 8px;
     overflow-x: scroll;
+    box-sizing: border-box;
 }
 
 .box {
