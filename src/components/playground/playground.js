@@ -1,53 +1,96 @@
 import html from "./playground.html";
 import css from "./playground.css";
 import { setupShadow } from "../../utils/misc";
+import { v4 as uuidv4 } from 'uuid';
 
 export class Playground extends HTMLElement {
 
     playgroundContainer = null;
-    box = null;
+    slotReference = null;
 
     constructor() {
         super();
         setupShadow(this, html, css);
     }
 
-    async connectedCallback() {
+    connectedCallback() {
         this.playgroundContainer = this.shadowRoot.querySelector('#playground-container');
-        this.box = this.shadowRoot.querySelector('.box');
-        this.createGrid();
-        this.addDragAndDropEventListener();
+        this.addEventListener('createstate', (e) => {
+            this.createState(e);
+        }, true);
 
+        let slot = document.createElement("div");
+        slot.id = "slot0";
+        slot.className = "slot";
+        slot.style.maxHeight = slot.style.height;
+        slot.style.maxWidth = slot.style.width;
+        this.slotReference = slot;
+        this.playgroundContainer.appendChild(this.slotReference);
+
+        this.createGrid();
+        this.addDropEventListenerToEverySlot();
     }
 
     createGrid() {
-        // this.playgroundContainer.style['grid-template-rows'] = "repeat(14, 1fr)";
-        console.log(window.innerHeight / this.box.offsetHeight);
-        let repeaterY = `repeat(${Math.floor(window.innerHeight / this.box.offsetHeight)}, 1fr)`;
-        let repeaterX = `repeat(${Math.floor(window.innerWidth / this.box.offsetWidth)}, 1fr)`;
+        let numberOfPossibleslotesY = Math.floor(window.innerHeight / this.slotReference.offsetHeight - 6);
+        let numberOfPossibleslotesX = Math.floor(window.innerWidth / this.slotReference.offsetWidth - 5);
+
+        let repeaterY = `repeat(${numberOfPossibleslotesY}, 1fr)`;
+        let repeaterX = `repeat(${numberOfPossibleslotesX}, 1fr)`;
         this.playgroundContainer.style['grid-template-rows'] = repeaterY;
         this.playgroundContainer.style['grid-template-columns'] = repeaterX;
-        // `
-        // <style>
-        //     grid-template-rows: repeat(14, 1fr);
-        // <style/>
-        // `
+
+        for (let i = 0; i < numberOfPossibleslotesY * numberOfPossibleslotesX - 1; i++) {
+            let nslotReference = this.slotReference.cloneNode();
+            nslotReference.id = "slot" + (i + 1)
+            this.playgroundContainer.appendChild(nslotReference);
+        }
     }
 
-    addDragAndDropEventListener() {
+    createState(e) {
+        let state = document.createElement("div");
+        state.draggable = true;
+        state.id = `state${uuidv4()}`;
+        state.className = "state";
+        this.addEveryEventToState(state);
+        let slotToFill = Array.from(this.playgroundContainer.querySelectorAll(".slot")).find(elem => {
+            return elem.firstChild === null;
+        })
+        slotToFill.appendChild(state);
+    }
 
-        function handleDragStart(e) {
+    addEveryEventToState(item) {
+        item.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData("element_id", e.target.id);
             this.style.opacity = '0.4';
-        }
-
-        function handleDragEnd(e) {
+        });
+        item.addEventListener('dragend', (e) => {
             this.style.opacity = '1';
-        }
+        });
 
-        let items = this.shadowRoot.querySelectorAll('.box');
+        item.addEventListener('dblclick', (e) => {
+            console.log("dblclick fired", e);
+            //open popup for adding state name
+        });
+
+        item.addEventListener('click', (e) => {
+
+        });
+    }
+
+    addDropEventListenerToEverySlot() {
+
+        let items = this.playgroundContainer.querySelectorAll(".slot");
         items.forEach(item => {
-            item.addEventListener('dragstart', handleDragStart, false);
-            item.addEventListener('dragend', handleDragEnd, false);
+            item.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            item.addEventListener('drop', (e) => {
+                e.preventDefault();
+                console.log(this, e);
+                let elementId = e.dataTransfer.getData("element_id");
+                e.target.appendChild(this.playgroundContainer.querySelector(`#${elementId}`));
+            });
         });
     }
 }

@@ -1,0 +1,9 @@
+.container {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row-reverse;
+}
+
+button {
+    margin: 25px 0px;
+}

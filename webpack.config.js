@@ -53,6 +53,7 @@ module.exports = (env, argv) => {
       }),
       new CopyPlugin({
         patterns: [
+          { from: "src/assets", to: "assets" },
           { from: "src/global.css", to: "global.css" },
           { from: "src/reset.css", to: "reset.css" }
         ],

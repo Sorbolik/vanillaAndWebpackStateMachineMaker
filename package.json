@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "style-loader": "^2.0.0",
-    "to-string-loader": "^1.1.6"
+    "to-string-loader": "^1.1.6",
+    "uuid": "^9.0.0"
   }
 }

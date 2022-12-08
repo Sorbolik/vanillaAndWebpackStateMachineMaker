@@ -3,24 +3,39 @@
     flex-direction: column;
 }
 
-.control-bar {}
+.control-bar-wrapper {}
+
+.border {
+    background-color: lightgray;
+}
 
 .playground {
     display: grid;
-    gap: 8px;
+    gap: 2px;
     overflow-x: scroll;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
-.box {
-    border: 3px solid #666;
-    background-color: #ddd;
-    border-radius: .5em;
-    padding: 10px;
+.slot {
+    border: 2px solid lightblue;
+    background-color: white;
+    border-radius: 0.5em;
+    height: 40px;
+    width: 40px;
+}
+
+
+.state {
+    border: 2px solid black;
+    background-color: white;
+    border-radius: 0.5em;
     cursor: move;
+    height: 38px;
+    width: 38px;
 }
 
-.box.over {
+.state.over {
     border: 3px dotted #666;
 }
 

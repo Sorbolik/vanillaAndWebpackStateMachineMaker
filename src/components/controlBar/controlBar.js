@@ -12,7 +12,10 @@ export class ControlBar extends HTMLElement {
 
     }
 
-    funcs() {
-
+    createNode() {
+        let createStateEvent = new Event('createstate', {
+            composed: true
+        });
+        this.dispatchEvent(createStateEvent);
     }
 }
