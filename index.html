@@ -1,18 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
+    <title>State machine maker</title>
+  </head>
+  <body>
+    <header class="bar">
+      <input id="name" class="machine-name" aria-label="Nome della macchina" spellcheck="false" />
+      <div class="group">
+        <button id="add">Nuovo stato</button>
+        <button id="set-initial">Iniziale</button>
+        <button id="toggle-final">Finale</button>
+        <button id="remove">Elimina</button>
+      </div>
+      <div class="group">
+        <button id="import">Importa</button>
+        <button id="export">Esporta</button>
+        <button id="clear">Svuota</button>
+        <input id="file" type="file" accept="application/json,.json" hidden />
+      </div>
+    </header>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="global.css" />
-  <title>State machine maker</title>
-</head>
+    <main class="workspace">
+      <div class="canvas">
+        <svg aria-label="Disegno della macchina a stati"></svg>
+        <input id="inline" class="inline" hidden spellcheck="false" />
+        <p class="hint">
+          Doppio clic sul foglio: nuovo stato · Trascina il pallino blu su un altro stato: transizione ·
+          Doppio clic su stato o freccia: rinomina · Canc: elimina · I: iniziale · F: finale
+        </p>
+      </div>
+      <aside class="data">
+        <h2>Dati salvati</h2>
+        <pre id="json"></pre>
+      </aside>
+    </main>
 
-<body>
-  <div class="wrapper">
-    <play-ground></play-ground>
-  </div>
-  <script type="module" src="/src/index.js"></script>
-</body>
-
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>

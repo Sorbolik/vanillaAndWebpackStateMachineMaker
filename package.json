@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "repository": {
@@ -13,10 +13,8 @@
     "url": "git+https://github.com/Sorbolik/vanillaAndWebpackStateMachineMaker.git"
   },
   "license": "ISC",
-  "dependencies": {
-    "uuid": "^9.0.0"
-  },
   "devDependencies": {
+    "typescript": "^5.9.3",
     "vite": "^7.1.0"
   }
 }
