@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "state-machine-maker",
+  "compatibility_date": "2026-06-01",
+  // Static site only: Cloudflare serves the Vite build from dist/
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  },
+  "previews": {}
+}
