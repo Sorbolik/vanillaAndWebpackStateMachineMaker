@@ -46,6 +46,16 @@ button.primary {
   color: #fff;
 }
 
+/* Save/open exist only for the owner (body.owner, set in main.ts) */
+body:not(.owner) .owner-only {
+  display: none;
+}
+
+button.quiet {
+  border-color: transparent;
+  color: var(--muted);
+}
+
 .status {
   align-self: center;
   color: var(--muted);

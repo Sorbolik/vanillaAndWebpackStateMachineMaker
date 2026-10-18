@@ -1,24 +1,12 @@
 import "./style.css";
-import { listMachines, loadMachine, saveMachine } from "./api";
+import { Unauthorized, listMachines, loadMachine, saveMachine, setKey } from "./api";
 import { Editor } from "./editor";
 import { type Machine, emptyMachine, exampleMachine, parseMachine, removeState, setEvents, toggleFinal } from "./machine";
 
+// Visitors can draw and export, but nothing is kept: a reload starts again from the example.
+// The owner unlocks the database with a key; only then the draft, Salva and Apri… exist.
+
 const KEY = "state-machine-maker";
-
-function load(): Machine {
-  try {
-    const saved = localStorage.getItem(KEY);
-    if (saved) return parseMachine(saved);
-  } catch {
-    // Unreadable or blocked storage: start from the example
-  }
-  return exampleMachine();
-}
-
-let machine = load();
-// Server id of the machine on screen; null until it is saved the first time
-let currentId: string | null = read(`${KEY}.id`);
-let dirty = false;
 
 function read(key: string): string | null {
   try {
@@ -36,6 +24,24 @@ function write(key: string, value: string | null): void {
     // Storage blocked: the session still works, it just is not remembered
   }
 }
+
+let ownerKey = read(`${KEY}.key`);
+setKey(ownerKey);
+
+function load(): Machine {
+  const saved = ownerKey ? read(KEY) : null;
+  try {
+    if (saved) return parseMachine(saved);
+  } catch {
+    // Unreadable draft: start from the example
+  }
+  return exampleMachine();
+}
+
+let machine = load();
+// Server id of the machine on screen; null until it is saved the first time
+let currentId: string | null = ownerKey ? read(`${KEY}.id`) : null;
+let dirty = false;
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const nameInput = $<HTMLInputElement>("name");
@@ -58,9 +64,11 @@ function changed(): void {
   editor.render();
   const text = JSON.stringify(machine, null, 2);
   json.textContent = text;
-  write(KEY, text);
   dirty = true;
-  showStatus(currentId ? "Modifiche non salvate" : "Mai salvata");
+  if (ownerKey) {
+    write(KEY, text);
+    showStatus(currentId ? "Modifiche non salvate" : "Mai salvata");
+  }
   updateButtons();
 }
 
@@ -82,15 +90,32 @@ function updateButtons(): void {
 function replace(next: Machine, id: string | null): void {
   machine = next;
   currentId = id;
-  write(`${KEY}.id`, id);
+  if (ownerKey) write(`${KEY}.id`, id);
   editor.selection = null;
   nameInput.value = machine.name;
   changed();
 }
 
-// ---- server ----
+// ---- owner ----
 
 const openSelect = $<HTMLSelectElement>("open");
+const loginButton = $<HTMLButtonElement>("login");
+
+function showOwnerTools(): void {
+  document.body.classList.toggle("owner", ownerKey !== null);
+  loginButton.textContent = ownerKey ? "Esci" : "Accedi";
+  if (!ownerKey) showStatus("Non viene salvata: usa Esporta");
+}
+
+function logout(): void {
+  ownerKey = null;
+  setKey(null);
+  write(`${KEY}.key`, null);
+  write(`${KEY}.id`, null);
+  write(KEY, null);
+  currentId = null;
+  showOwnerTools();
+}
 
 async function refreshList(): Promise<void> {
   try {
@@ -100,10 +125,37 @@ async function refreshList(): Promise<void> {
       ...machines.map((m) => new Option(m.name || "senza nome", m.id)),
     );
     openSelect.value = "";
-  } catch {
+  } catch (e) {
+    if (e instanceof Unauthorized) {
+      logout();
+      return;
+    }
     openSelect.replaceChildren(new Option("Server non raggiungibile", ""));
   }
 }
+
+loginButton.onclick = async () => {
+  if (ownerKey) {
+    logout();
+    return;
+  }
+  const key = prompt("Chiave del database")?.trim();
+  if (!key) return;
+  setKey(key);
+  try {
+    await listMachines();
+  } catch (e) {
+    setKey(null);
+    alert(e instanceof Error ? e.message : "Accesso non riuscito");
+    return;
+  }
+  ownerKey = key;
+  write(`${KEY}.key`, key);
+  write(KEY, JSON.stringify(machine));
+  showOwnerTools();
+  showStatus(currentId ? "Modifiche non salvate" : "Mai salvata");
+  await refreshList();
+};
 
 $("save").onclick = async () => {
   showStatus("Salvataggio…");
@@ -115,6 +167,7 @@ $("save").onclick = async () => {
     showStatus("Salvata");
     await refreshList();
   } catch (e) {
+    if (e instanceof Unauthorized) logout();
     showStatus(e instanceof Error ? e.message : "Salvataggio non riuscito", true);
   }
 };
@@ -129,6 +182,7 @@ openSelect.onchange = async () => {
     dirty = false;
     showStatus("Salvata");
   } catch (e) {
+    if (e instanceof Unauthorized) logout();
     showStatus(e instanceof Error ? e.message : "Apertura non riuscita", true);
   }
 };
@@ -210,5 +264,8 @@ document.addEventListener("keydown", (e) => {
 
 replace(machine, currentId);
 dirty = false;
-showStatus(currentId ? "" : "Mai salvata");
-refreshList();
+showOwnerTools();
+if (ownerKey) {
+  showStatus(currentId ? "" : "Mai salvata");
+  refreshList();
+}

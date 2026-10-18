@@ -10,8 +10,8 @@
     <header class="bar">
       <div class="group">
         <input id="name" class="machine-name" aria-label="Nome della macchina" spellcheck="false" />
-        <button id="save" class="primary">Salva</button>
-        <select id="open" aria-label="Apri una macchina salvata"></select>
+        <button id="save" class="primary owner-only">Salva</button>
+        <select id="open" class="owner-only" aria-label="Apri una macchina salvata"></select>
         <span id="status" class="status" role="status"></span>
       </div>
       <div class="group">
@@ -24,6 +24,7 @@
         <button id="import">Importa</button>
         <button id="export">Esporta</button>
         <button id="new">Nuova</button>
+        <button id="login" class="quiet">Accedi</button>
         <input id="file" type="file" accept="application/json,.json" hidden />
       </div>
     </header>
@@ -38,7 +39,7 @@
         </p>
       </div>
       <aside class="data">
-        <h2>Dati salvati</h2>
+        <h2>JSON della macchina</h2>
         <pre id="json"></pre>
       </aside>
     </main>
