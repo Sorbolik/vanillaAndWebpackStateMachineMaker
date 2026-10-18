@@ -1,11 +1,16 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "state-machine-maker",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-06-01",
-  // Static site only: Cloudflare serves the Vite build from dist/
+  // The Vite build in dist/ is served as static files; only /api/* runs the Worker
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application"
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
   },
+  // Private link to the API Worker (Sorbolik/stateMachineMakerSERVER)
+  "services": [{ "binding": "API", "service": "state-machine-api" }],
   "previews": {}
 }
