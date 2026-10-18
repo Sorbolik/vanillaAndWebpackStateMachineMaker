@@ -2,7 +2,8 @@
 
 import { type Machine, parseMachine } from "./machine";
 
-const BASE = import.meta.env.VITE_API_URL ?? "https://state-machine-api.sergiosorbi.workers.dev";
+// Same address as the editor in production; set VITE_API_URL to call another server (e.g. local dev)
+const BASE = import.meta.env.VITE_API_URL ?? "/api";
 
 export type Summary = { id: string; name: string; updated: string };
 
