@@ -37,3 +37,7 @@ quindi una sola regola Cloudflare Access protegge tutto.
 - In sviluppo `VITE_API_URL` (`.env.development`) punta a `http://localhost:8787`:
   avvia il server con `npm run dev` nel suo repo.
 - Build: `npm run build`, deploy: `npx wrangler deploy`.
+
+Ogni push su `main` viene pubblicato da Cloudflare Workers Builds. Se cambi sia
+l'editor sia il server, pubblica prima l'editor: il server non ha un indirizzo
+pubblico e si raggiunge solo da `/api` dell'editor.
