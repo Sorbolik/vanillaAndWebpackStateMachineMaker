@@ -8,7 +8,12 @@
   </head>
   <body>
     <header class="bar">
-      <input id="name" class="machine-name" aria-label="Nome della macchina" spellcheck="false" />
+      <div class="group">
+        <input id="name" class="machine-name" aria-label="Nome della macchina" spellcheck="false" />
+        <button id="save" class="primary">Salva</button>
+        <select id="open" aria-label="Apri una macchina salvata"></select>
+        <span id="status" class="status" role="status"></span>
+      </div>
       <div class="group">
         <button id="add">Nuovo stato</button>
         <button id="set-initial">Iniziale</button>
@@ -18,7 +23,7 @@
       <div class="group">
         <button id="import">Importa</button>
         <button id="export">Esporta</button>
-        <button id="clear">Svuota</button>
+        <button id="new">Nuova</button>
         <input id="file" type="file" accept="application/json,.json" hidden />
       </div>
     </header>

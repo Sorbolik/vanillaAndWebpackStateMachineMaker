@@ -30,6 +30,32 @@ button {
   cursor: pointer;
 }
 
+select {
+  font: inherit;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: inherit;
+  max-width: 180px;
+}
+
+button.primary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+.status {
+  align-self: center;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.status.error {
+  color: #c62828;
+}
+
 button:hover:not(:disabled) {
   border-color: var(--ink);
 }

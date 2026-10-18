@@ -1,4 +1,5 @@
 import "./style.css";
+import { listMachines, loadMachine, saveMachine } from "./api";
 import { Editor } from "./editor";
 import { type Machine, emptyMachine, exampleMachine, parseMachine, removeState, setEvents, toggleFinal } from "./machine";
 
@@ -15,6 +16,26 @@ function load(): Machine {
 }
 
 let machine = load();
+// Server id of the machine on screen; null until it is saved the first time
+let currentId: string | null = read(`${KEY}.id`);
+let dirty = false;
+
+function read(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function write(key: string, value: string | null): void {
+  try {
+    if (value === null) localStorage.removeItem(key);
+    else localStorage.setItem(key, value);
+  } catch {
+    // Storage blocked: the session still works, it just is not remembered
+  }
+}
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const nameInput = $<HTMLInputElement>("name");
@@ -37,12 +58,16 @@ function changed(): void {
   editor.render();
   const text = JSON.stringify(machine, null, 2);
   json.textContent = text;
-  try {
-    localStorage.setItem(KEY, text);
-  } catch {
-    // Not saved (private mode): the export button still works
-  }
+  write(KEY, text);
+  dirty = true;
+  showStatus(currentId ? "Modifiche non salvate" : "Mai salvata");
   updateButtons();
+}
+
+const statusLine = $<HTMLSpanElement>("status");
+function showStatus(text: string, error = false): void {
+  statusLine.textContent = text;
+  statusLine.classList.toggle("error", error);
 }
 
 function updateButtons(): void {
@@ -54,12 +79,59 @@ function updateButtons(): void {
   buttons.remove.disabled = !s;
 }
 
-function replace(next: Machine): void {
+function replace(next: Machine, id: string | null): void {
   machine = next;
+  currentId = id;
+  write(`${KEY}.id`, id);
   editor.selection = null;
   nameInput.value = machine.name;
   changed();
 }
+
+// ---- server ----
+
+const openSelect = $<HTMLSelectElement>("open");
+
+async function refreshList(): Promise<void> {
+  try {
+    const machines = await listMachines();
+    openSelect.replaceChildren(
+      new Option(machines.length ? `Apri… (${machines.length})` : "Nessuna salvata", ""),
+      ...machines.map((m) => new Option(m.name || "senza nome", m.id)),
+    );
+    openSelect.value = "";
+  } catch {
+    openSelect.replaceChildren(new Option("Server non raggiungibile", ""));
+  }
+}
+
+$("save").onclick = async () => {
+  showStatus("Salvataggio…");
+  try {
+    const id = await saveMachine(currentId, machine);
+    currentId = id;
+    write(`${KEY}.id`, id);
+    dirty = false;
+    showStatus("Salvata");
+    await refreshList();
+  } catch (e) {
+    showStatus(e instanceof Error ? e.message : "Salvataggio non riuscito", true);
+  }
+};
+
+openSelect.onchange = async () => {
+  const id = openSelect.value;
+  openSelect.value = "";
+  if (!id) return;
+  if (dirty && !confirm("Ci sono modifiche non salvate. Aprire comunque?")) return;
+  try {
+    replace(await loadMachine(id), id);
+    dirty = false;
+    showStatus("Salvata");
+  } catch (e) {
+    showStatus(e instanceof Error ? e.message : "Apertura non riuscita", true);
+  }
+};
 
 // ---- actions on the selection ----
 
@@ -101,8 +173,9 @@ nameInput.oninput = () => {
   changed();
 };
 
-$("clear").onclick = () => {
-  if (confirm("Cancellare questa macchina e ripartire da zero?")) replace(emptyMachine());
+$("new").onclick = () => {
+  if (dirty && !confirm("Ci sono modifiche non salvate. Iniziare una nuova macchina?")) return;
+  replace(emptyMachine(), null);
 };
 
 $("export").onclick = () => {
@@ -121,7 +194,7 @@ file.onchange = async () => {
   file.value = "";
   if (!f) return;
   try {
-    replace(parseMachine(await f.text()));
+    replace(parseMachine(await f.text()), null);
   } catch (e) {
     alert(e instanceof Error ? e.message : "File non valido");
   }
@@ -135,4 +208,7 @@ document.addEventListener("keydown", (e) => {
   else if (e.key === "Escape") editor.select(null);
 });
 
-replace(machine);
+replace(machine, currentId);
+dirty = false;
+showStatus(currentId ? "" : "Mai salvata");
+refreshList();

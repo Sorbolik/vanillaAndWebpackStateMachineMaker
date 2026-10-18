@@ -20,8 +20,21 @@ npm run build    # typecheck + build in dist/
 | Doppio clic su stato / freccia | rinomina stato / modifica eventi (separati da virgola) |
 | `Canc` · `I` · `F` · `Esc` | elimina · iniziale · finale · deseleziona |
 
-La macchina si salva da sola nel browser (localStorage). *Esporta* e *Importa*
-scaricano e caricano lo stesso JSON.
+La bozza si salva da sola nel browser (localStorage). *Salva* la manda al
+server ([stateMachineMakerSERVER](https://github.com/Sorbolik/stateMachineMakerSERVER)),
+*Apri…* elenca quelle salvate. *Esporta* e *Importa* scaricano e caricano lo stesso JSON.
+
+## Server
+
+L'indirizzo dell'API viene da `VITE_API_URL`. In sviluppo è `http://localhost:8787`
+(`.env.development`, avvia il server con `npm run dev` nel suo repo); senza la
+variabile usa `https://state-machine-api.sergiosorbi.workers.dev`.
+
+## Pubblicazione
+
+`wrangler.jsonc` pubblica `dist/` come sito statico su Cloudflare Workers
+(`state-machine-maker.sergiosorbi.workers.dev`). Build: `npm run build`,
+deploy: `npx wrangler deploy`.
 
 ## Formato dati
 
@@ -62,6 +75,7 @@ Una macchina è un solo oggetto JSON, quello che vedi nel pannello a destra:
 src/machine.ts   tipi + operazioni pure sul modello (aggiungi, rinomina, valida l'import)
 src/editor.ts    disegno SVG e gesti col puntatore
 src/main.ts      barra, tastiera, salvataggio, import/export
+src/api.ts       chiamate al server
 src/style.css
 ```
 
