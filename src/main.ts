@@ -3,10 +3,12 @@ import { Unauthorized, listMachines, loadMachine, saveMachine, setKey } from "./
 import { Editor } from "./editor";
 import { type Machine, emptyMachine, exampleMachine, parseMachine, removeState, setEvents, toggleFinal } from "./machine";
 
-// Visitors can draw and export, but nothing is kept: a reload starts again from the example.
-// The owner unlocks the database with a key; only then the draft, Salva and Apri… exist.
+// Visitors have every feature, but Salva and Apri… use a store in memory: a reload loses it all.
+// The owner unlocks the database with a key; only then the draft survives a reload too.
+// Inside an iframe (the portfolio) or with ?embed there is no way to log in.
 
 const KEY = "state-machine-maker";
+const embedded = window.self !== window.top || new URLSearchParams(location.search).has("embed");
 
 function read(key: string): string | null {
   try {
@@ -25,7 +27,7 @@ function write(key: string, value: string | null): void {
   }
 }
 
-let ownerKey = read(`${KEY}.key`);
+let ownerKey = embedded ? null : read(`${KEY}.key`);
 setKey(ownerKey);
 
 function load(): Machine {
@@ -65,10 +67,8 @@ function changed(): void {
   const text = JSON.stringify(machine, null, 2);
   json.textContent = text;
   dirty = true;
-  if (ownerKey) {
-    write(KEY, text);
-    showStatus(currentId ? "Modifiche non salvate" : "Mai salvata");
-  }
+  if (ownerKey) write(KEY, text);
+  showStatus(currentId ? "Modifiche non salvate" : "Mai salvata");
   updateButtons();
 }
 
@@ -101,10 +101,11 @@ function replace(next: Machine, id: string | null): void {
 const openSelect = $<HTMLSelectElement>("open");
 const loginButton = $<HTMLButtonElement>("login");
 
+loginButton.hidden = embedded;
+
 function showOwnerTools(): void {
-  document.body.classList.toggle("owner", ownerKey !== null);
   loginButton.textContent = ownerKey ? "Esci" : "Accedi";
-  if (!ownerKey) showStatus("Non viene salvata: usa Esporta");
+  loginButton.title = ownerKey ? "" : "Salva nel database (solo il proprietario)";
 }
 
 function logout(): void {
@@ -115,6 +116,8 @@ function logout(): void {
   write(KEY, null);
   currentId = null;
   showOwnerTools();
+  showStatus("Mai salvata");
+  refreshList();
 }
 
 async function refreshList(): Promise<void> {
@@ -150,10 +153,12 @@ loginButton.onclick = async () => {
     return;
   }
   ownerKey = key;
+  // A machine saved in memory is not in the database yet
+  currentId = null;
   write(`${KEY}.key`, key);
   write(KEY, JSON.stringify(machine));
   showOwnerTools();
-  showStatus(currentId ? "Modifiche non salvate" : "Mai salvata");
+  showStatus("Mai salvata");
   await refreshList();
 };
 
@@ -162,9 +167,9 @@ $("save").onclick = async () => {
   try {
     const id = await saveMachine(currentId, machine);
     currentId = id;
-    write(`${KEY}.id`, id);
+    if (ownerKey) write(`${KEY}.id`, id);
     dirty = false;
-    showStatus("Salvata");
+    showStatus(ownerKey ? "Salvata" : "Salvata fino al ricaricamento");
     await refreshList();
   } catch (e) {
     if (e instanceof Unauthorized) logout();
@@ -265,7 +270,5 @@ document.addEventListener("keydown", (e) => {
 replace(machine, currentId);
 dirty = false;
 showOwnerTools();
-if (ownerKey) {
-  showStatus(currentId ? "" : "Mai salvata");
-  refreshList();
-}
+showStatus(currentId ? "" : "Mai salvata");
+refreshList();
