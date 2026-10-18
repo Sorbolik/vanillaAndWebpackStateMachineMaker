@@ -1,4 +1,5 @@
 // Client for the state machine API (Sorbolik/stateMachineMakerSERVER).
+// The database belongs to the owner: every call carries the owner's key.
 
 import { type Machine, parseMachine } from "./machine";
 
@@ -7,8 +8,19 @@ const BASE = import.meta.env.VITE_API_URL ?? "/api";
 
 export type Summary = { id: string; name: string; updated: string };
 
+let key: string | null = null;
+export const setKey = (k: string | null) => {
+  key = k;
+};
+
+export class Unauthorized extends Error {}
+
 async function call(path: string, init?: RequestInit): Promise<Response> {
-  const res = await fetch(BASE + path, { ...init, headers: { "content-type": "application/json" } });
+  const res = await fetch(BASE + path, {
+    ...init,
+    headers: { "content-type": "application/json", authorization: `Bearer ${key ?? ""}` },
+  });
+  if (res.status === 401) throw new Unauthorized("Chiave non valida");
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error ?? `Errore del server (${res.status})`);
