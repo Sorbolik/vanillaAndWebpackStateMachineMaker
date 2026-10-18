@@ -1,5 +1,5 @@
-import html from "./playground.html";
-import css from "./playground.css";
+import html from "./playground.html?raw";
+import css from "./playground.css?raw";
 import { setupShadow } from "../../utils/misc";
 import { v4 as uuidv4 } from 'uuid';
 import { StateMachine } from "../../models/stateMachine";

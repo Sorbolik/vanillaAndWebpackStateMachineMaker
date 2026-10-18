@@ -1,6 +1,6 @@
 
-import html from "./customButton.html";
-import css from "./customButton.css";
+import html from "./customButton.html?raw";
+import css from "./customButton.css?raw";
 
 export class CustomButton extends HTMLButtonElement {
 

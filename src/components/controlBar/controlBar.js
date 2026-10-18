@@ -1,5 +1,5 @@
-import html from "./controlBar.html";
-import css from "./controlBar.css";
+import html from "./controlBar.html?raw";
+import css from "./controlBar.css?raw";
 import { setupShadow } from "../../utils/misc";
 export class ControlBar extends HTMLElement {
 

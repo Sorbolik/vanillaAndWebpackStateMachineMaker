@@ -1,5 +1,5 @@
-import html from "./header.html";
-import css from "./header.css";
+import html from "./header.html?raw";
+import css from "./header.css?raw";
 import { setupShadow } from "../../utils/misc";
 export class Header extends HTMLElement {
 

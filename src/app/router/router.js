@@ -1,5 +1,5 @@
-import html from "./router.html";
-import css from "./router.css";
+import html from "./router.html?raw";
+import css from "./router.css?raw";
 import { setupShadow } from "../../utils/misc";
 export class AppRouter extends HTMLElement {
 
