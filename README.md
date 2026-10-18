@@ -20,13 +20,15 @@ npm run build    # typecheck + build in dist/
 | Doppio clic su stato / freccia | rinomina stato / modifica eventi (separati da virgola) |
 | `Canc` · `I` · `F` · `Esc` | elimina · iniziale · finale · deseleziona |
 
-Chiunque può disegnare, vedere il JSON, *Esporta* e *Importa*, ma niente resta:
-ricaricando la pagina si riparte dall'esempio.
+Chiunque ha tutte le funzioni, *Salva* e *Apri…* compresi, ma senza chiave le
+macchine restano solo nella pagina: ricaricando si perdono e si riparte dall'esempio.
 
 Il database è solo del proprietario. *Accedi* chiede la chiave (`ADMIN_KEY` del
-server); con la chiave giusta compaiono *Salva* e *Apri…*
+server); con la chiave giusta *Salva* e *Apri…* usano il database
 ([stateMachineMakerSERVER](https://github.com/Sorbolik/stateMachineMakerSERVER))
 e la bozza resta nel browser. *Esci* cancella chiave e bozza da quel browser.
+
+Dentro un iframe (il portfolio) o con `?embed` nell'indirizzo *Accedi* non c'è.
 
 ## Server e pubblicazione
 
